@@ -53,6 +53,7 @@ class Kronos_sharedQ(torch.optim.Optimizer):
         adamw_params = list(adamw_params) if adamw_params is not None else []
         params.extend(adamw_params)
         super().__init__(params, defaults)
+        self.rng = random.Random(0x12381)
 
         for p in kronos_params:
             if p.ndim >= 2 and p.size(0) < 10000:
@@ -115,7 +116,7 @@ class Kronos_sharedQ(torch.optim.Optimizer):
                 
                 Q = self.shared_Qs[n_cols]
 
-                if torch.rand(1).item() < whitening_prob:
+                if self.rng.random() < whitening_prob:
                     Q = single_sided_whitening(torch.sign(g), Q, lr_param=group['lr_param'])
                     self.shared_Qs[n_cols] = Q
 
